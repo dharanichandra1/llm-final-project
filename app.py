@@ -12,6 +12,9 @@ from langchain.chat_models import ChatOpenAI
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from langchain.llms import HuggingFaceHub
 from htmlTemplate import css, bot_template, user_template
+from langchain.llms import HuggingFaceHub
+from langchain.chains import ConversationalRetrievalChain
+from langchain.memory import ConversationBufferMemory
 
 
 
@@ -34,16 +37,19 @@ def get_vectorstore(text_chunks):
 
 
 def get_conversation_chain(vectorstore):
-    # tokenizer = AutoTokenizer.from_pretrained("microsoft/DialoGPT-medium")
-    #llm = HuggingFaceHub(repo_id="microsoft/DialoGPT-medium", model_kwargs={"temperature":0.5, "max_length":512})
-    llm = HuggingFaceHub(repo_id="google/flan-t5-xxl", model_kwargs={"temperature":0.2, "max_length":512})
-    #llm = HuggingFaceHub(repo_id="tiiuae/falcon-40b", model_kwargs={"temperature":0.4, "max_length":512})
+    # Initialize the model with your specific identifier
+    llm = HuggingFaceHub(repo_id="gpt-4o-mini-2024-07-18:personal:fine-tune-test:AYMkExVx", model_kwargs={"temperature":0.2, "max_length":512})
+  
+    # Set up memory for conversation history
     memory = ConversationBufferMemory(memory_key='chat_history', return_messages=True)
+    
+    # Create the conversational retrieval chain using the vector store
     conver_chain = ConversationalRetrievalChain.from_llm(
-        llm = llm,
-        retriever= vectorstore.as_retriever(),
-        memory = memory
+        llm=llm,
+        retriever=vectorstore.as_retriever(),
+        memory=memory
     )
+    
     return conver_chain
 
 
@@ -65,7 +71,7 @@ def main():
 
     st.set_page_config(page_title='Chat with PDFs')
     st.write(css, unsafe_allow_html=True)
-    st.title("MA-LTSS QnA Bot")
+    st.title("Oregon Gov. Assistance Bot")
 
     if "conversation" not in st.session_state:
         st.session_state.conversation = None
