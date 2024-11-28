@@ -14,13 +14,6 @@ from langchain.llms import HuggingFaceHub
 from htmlTemplate import css, bot_template, user_template
 
 
-def get_pdf_text(pdf_docx):
-    text = ""
-    for pdf in pdf_docx:
-        file_reader = PdfReader(pdf)
-        for page in file_reader.pages:
-            text += page.extract_text()
-    return text
 
 
 def get_text_chunks(raw_text):
@@ -68,7 +61,7 @@ def handle_userinput(user_question):
 
 
 def main():
-    load_dotenv()
+    #load_dotenv()
 
     st.set_page_config(page_title='Chat with PDFs')
     st.write(css, unsafe_allow_html=True)
@@ -89,24 +82,6 @@ def main():
             st.write("An error occure: ", e)
 
 
-    with st.sidebar:
-        st.subheader("Upload you PDFs here")
-        pdf_docx = st.file_uploader("Upload your PDFs here and click on 'Process", accept_multiple_files=True)
-        if st.button("Process"):
-            with st.spinner("Loading.."):
-                #get the pdf text
-                raw_text = get_pdf_text(pdf_docx)
-                #st.write(raw_text)
-                
-                #get the text chunks
-                text_chunks = get_text_chunks(raw_text)
-                #st.write(text_chunks)
-
-                #get the embeddings/vector store
-                vectorstore = get_vectorstore(text_chunks)
-
-                #create converstaion chain
-                st.session_state.conversation = get_conversation_chain(vectorstore)
             
     
 
